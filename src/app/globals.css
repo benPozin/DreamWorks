@@ -1,26 +1,57 @@
+/* Tailwind v4: single import */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root{
+  --nav-h: 64px; /* match your Navbar h-20 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Theme tokens */
+@theme {
+  /* LIGHT default */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+
+  /* Brand (sampled from your logo) */
+  --color-brand-50:  #edf4f7;
+  --color-brand-100: #d6e6ef;
+  --color-brand-200: #b7cfdf;
+  --color-brand-300: #8db0c9;
+  --color-brand-400: #5e8cac;
+  --color-brand-500: #367094; /* DW blue */
+  --color-brand-600: #2d5f74;
+  --color-brand-700: #254f61;
+  --color-brand-800: #1f4251;
+  --color-brand-900: #1a3743;
+
+  /* neutrals for cards/lines */
+  --color-surface: #f8fafc;   /* card bg */
+  --color-border: #e5e7eb;    /* soft border */
+  --radius-card: 1rem;        /* rounded-2xl */
+  --shadow-card: 0 10px 25px -10px rgba(0,0,0,.12);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Remove auto-dark; we’ll add a toggle later if you want */
+html, body { height: 100%; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter,
+    "Helvetica Neue", Arial, "Noto Sans",
+    "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* helpers */
+.container {
+  @apply mx-auto px-4 md:px-6; /* smaller side padding */
+}
+.card { background:var(--color-surface); border:1px solid var(--color-border);
+        border-radius:var(--radius-card); box-shadow:var(--shadow-card); }
+.btn { border-radius:.75rem; padding:.75rem 1.25rem; font-weight:600; }
+.btn-primary { background:var(--color-brand-500); color:white; }
+.btn-primary:hover { background:var(--color-brand-600); }
+.btn-ghost { border:1px solid var(--color-border); }
