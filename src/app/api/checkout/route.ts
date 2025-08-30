@@ -6,13 +6,16 @@ export const runtime = "nodejs"; // Stripe SDK needs Node runtime
 
 export async function POST(req: NextRequest) {
   try {
-    const { productId, quantity = 1 } = await req.json();
+    const { productId, quantity = 1 } = (await req.json()) as {
+      productId?: string;
+      quantity?: number;
+    };
 
-    const p = findById(productId);
+    const p = productId ? findById(productId) : undefined;
     if (!p || p.disabled) {
       return NextResponse.json(
         { error: "Invalid or unavailable product" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,20 +38,17 @@ export async function POST(req: NextRequest) {
           },
         },
       ],
-      // ✅ updated to use thank-you + canceled pages
       success_url: `${siteUrl}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/canceled`,
-      // Optional extras:
       // shipping_address_collection: { allowed_countries: ["CA", "US"] },
       // automatic_tax: { enabled: true },
     });
 
     return NextResponse.json({ url: session.url }, { status: 200 });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Checkout failed";
     console.error("Checkout error:", err);
-    return NextResponse.json(
-      { error: err?.message || "Checkout failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

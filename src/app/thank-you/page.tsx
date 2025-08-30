@@ -1,7 +1,8 @@
-// Server component (App Router)
-import { Metadata } from "next";
-import { stripe } from "@/lib/stripe"; // server-only in our helper
-import { CheckCircle } from "lucide-react"; // optional, or remove if you don’t use lucide
+// src/app/thank-you/page.tsx
+import type { Metadata } from "next";
+import Link from "next/link";
+import { stripe } from "@/lib/stripe";
+import type Stripe from "stripe";
 
 export const metadata: Metadata = {
   title: "Thank you | DreamWorks Resin",
@@ -18,30 +19,35 @@ function fmtCAD(cents: number) {
 export default async function ThankYou({
   searchParams,
 }: {
-  searchParams: { session_id?: string; success?: string };
+  searchParams: { session_id?: string };
 }) {
-  // We support either ?session_id=... (best) or ?success=1 (fallback)
   const sessionId = searchParams?.session_id;
 
-  // Try to fetch Checkout Session to show a nicer summary. If not present, page still looks good.
   let email: string | null = null;
   let total: string | null = null;
   let productSummary: string | null = null;
 
   if (sessionId) {
     try {
-      const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ["line_items"] });
-      // total
-      if (session.amount_total != null) total = fmtCAD(session.amount_total);
-      // email
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ["line_items"],
+      });
+
       if (typeof session.customer_details?.email === "string") {
         email = session.customer_details.email;
       }
-      // quick product summary (first line item)
-      const first = (session.line_items?.data?.[0] as any) || null;
-      if (first?.description) productSummary = first.description as string;
+      if (typeof session.amount_total === "number") {
+        total = fmtCAD(session.amount_total);
+      }
+
+      const items = (session as Stripe.Checkout.Session & {
+        line_items?: Stripe.ApiList<Stripe.LineItem>;
+      }).line_items;
+
+      const first = items?.data?.[0];
+      if (first?.description) productSummary = first.description;
     } catch {
-      // ignore—page still renders
+      // ignore; show generic thank-you
     }
   }
 
@@ -49,15 +55,13 @@ export default async function ThankYou({
     <main className="min-h-dvh flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-xl rounded-2xl border bg-white p-8 shadow-[0_10px_25px_-12px_rgba(0,0,0,0.12)]">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-green-100 p-2">
-            {/* If you don't use lucide-react, replace with ✅ */}
-            <CheckCircle className="h-6 w-6 text-green-600" />
-          </div>
+          <div className="rounded-full bg-green-100 p-2">✅</div>
           <h1 className="text-xl font-semibold">Payment successful</h1>
         </div>
 
         <p className="mt-3 text-gray-600">
-          Thanks for your order{email ? `, ${email}` : ""}! We’re getting it ready.
+          Thanks for your order{email ? `, ${email}` : ""}! We’re getting it
+          ready.
         </p>
 
         {(total || productSummary) && (
@@ -77,18 +81,18 @@ export default async function ThankYou({
         </p>
 
         <div className="mt-8 flex gap-3">
-          <a
+          <Link
             href="/products"
             className="flex-1 rounded-lg border px-4 py-2 text-center hover:bg-black/5"
           >
             Continue shopping
-          </a>
-          <a
+          </Link>
+          <Link
             href="/"
             className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-center text-white hover:bg-blue-700"
           >
             Go home
-          </a>
+          </Link>
         </div>
       </div>
     </main>
