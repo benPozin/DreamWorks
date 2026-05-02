@@ -1,0 +1,11 @@
+---
+description: Never add AI co-author or Co-authored-by trailers to git commits
+alwaysApply: true
+---
+
+# Git commits
+
+When creating commits via the agent or terminal commands:
+
+- Do **not** add `Co-authored-by:`, `Signed-off-by:`, or any trailer that attributes the Assistant/Cursor/OpenAI/etc.
+- Use a plain commit message only (e.g. `git commit -m "Describe change"`).
