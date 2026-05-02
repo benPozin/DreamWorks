@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowUpRight, ChevronDown, AlertTriangle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -37,7 +37,7 @@ const CATEGORY_IMAGES: Partial<Record<Service["category"], string>> = {
   Removables: "/services/removable.png",
 };
 
-export default function ShopPage() {
+function ShopPageInner() {
   const sp = useSearchParams();
   const requestedCategory = sp.get("category");
   const initialCategory = CATEGORY_DEFS.some((c) => c.id === requestedCategory)
@@ -231,6 +231,14 @@ export default function ShopPage() {
         </div>
       </Section>
     </>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={null}>
+      <ShopPageInner />
+    </Suspense>
   );
 }
 
