@@ -1,26 +1,198 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F4F7FB;
+  --fg: #0A1A2F;
+  --fg-muted: #4A5C75;
+  --fg-subtle: #6B7E96;
+  --primary: #0F2746;          /* deep navy text/UI */
+  --secondary: #1C3A66;
+  --border: #E2EAF3;
+  --border-strong: #CBD7E6;
+
+  /* DreamWorks blue (brand accent, used like gold/CTA on the main site) */
+  --blue: #1B5BAE;
+  --blue-soft: #2D6FC9;
+  --blue-deep: #143D75;
+  --blue-tint: #DDE9F8;
+  --blue-haze: #EEF4FC;
+
+  /* VIP palette (dark + gold, used ONLY on /vip) */
+  --vip-bg: #0C0A09;
+  --vip-bg-elevated: #1C1917;
+  --vip-fg: #FAFAF9;
+  --vip-fg-muted: #A8A29E;
+  --vip-gold: #D4A017;
+  --vip-gold-soft: #EAB308;
+  --vip-champagne: #E7D7A1;
+  --vip-border: rgba(212, 160, 23, 0.2);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-muted: var(--bg-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-blue: var(--blue);
+  --color-blue-soft: var(--blue-soft);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-tint: var(--blue-tint);
+  --color-blue-haze: var(--blue-haze);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-vip-bg: var(--vip-bg);
+  --color-vip-bg-elevated: var(--vip-bg-elevated);
+  --color-vip-fg: var(--vip-fg);
+  --color-vip-fg-muted: var(--vip-fg-muted);
+  --color-vip-gold: var(--vip-gold);
+  --color-vip-gold-soft: var(--vip-gold-soft);
+  --color-vip-champagne: var(--vip-champagne);
+  --color-vip-border: var(--vip-border);
+
+  --font-sans: var(--font-figtree), var(--font-noto), system-ui, sans-serif;
+  --font-body: var(--font-noto), var(--font-figtree), system-ui, sans-serif;
+  --font-display: var(--font-figtree), system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+* {
+  border-color: var(--border);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* ─── Liquid glass surfaces (light) ─── */
+.glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(238,244,252,0.65) 100%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.85);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.95) inset,
+    0 0 0 1px rgba(15,39,70,0.04),
+    0 24px 48px -24px rgba(15,39,70,0.14);
+}
+
+.glass-blue {
+  background: linear-gradient(135deg, rgba(27,91,174,0.06) 0%, rgba(27,91,174,0.02) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(27,91,174,0.14);
+}
+
+/* VIP-only dark glass */
+.glass-dark {
+  background: linear-gradient(135deg, rgba(28,25,23,0.85) 0%, rgba(28,25,23,0.6) 100%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(212,160,23,0.18);
+  box-shadow:
+    0 1px 0 rgba(212,160,23,0.12) inset,
+    0 24px 48px -24px rgba(0,0,0,0.6);
+}
+
+.blue-text {
+  background: linear-gradient(135deg, #1B5BAE 0%, #2D6FC9 50%, #143D75 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #D4A017 0%, #EAB308 50%, #A16207 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.champagne-text {
+  background: linear-gradient(135deg, #E7D7A1 0%, #D4A017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.noise {
+  position: relative;
+}
+.noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Subtle grid background — useful behind hero */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(15,39,70,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,39,70,0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%);
+}
+
+/* ─── Animated mesh background ─── */
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2%, -1%) scale(1.05); }
+  66% { transform: translate(-1%, 2%) scale(0.98); }
+}
+.mesh-bg {
+  position: absolute;
+  inset: -10%;
+  filter: blur(80px);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 0;
+}
+.mesh-bg > div {
+  position: absolute;
+  border-radius: 50%;
+  animation: mesh-drift 22s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(110deg, transparent 30%, rgba(27,91,174,0.35) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 3.5s linear infinite;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Focus rings ─── */
+*:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

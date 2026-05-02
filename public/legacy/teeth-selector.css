@@ -1,0 +1,115 @@
+/* Teeth selector styles extracted from pmma project */
+.teeth-selector-root { text-align: center; }
+.teeth-selector-root #teeth-menu { display: none; }
+.teeth-selector-root .btn { cursor: pointer; border: none; }
+.tooth-wrapper {
+    display: inline-block;
+    position: relative;
+    margin: 0 auto;
+}
+
+.svg-tooth-designs {
+    position: absolute;
+    left: 26px;
+    top: 14px;
+}
+
+.tooth-text.tooth-text-upper {
+    position: absolute;
+    text-align: center;
+    display: flex;
+    right: 7.6rem;
+    top: 5rem;
+    width: auto;
+    justify-content: center;
+    color: #374852;
+    margin-left: 7.2rem;
+}
+
+.tooth-text.tooth-text-lower {
+    position: absolute;
+    right: 7.6rem;
+    text-align: center;
+    display: flex;
+    width: auto;
+    justify-content: center;
+    color: #374852;
+    margin-left: 7.2rem;
+    bottom: 5rem;
+}
+
+.fil0 {
+    fill: #fff;
+}
+
+.fil0:hover {
+    fill: #014CA9;
+}
+
+.tooth:hover .fil1 {
+    fill: white;
+}
+
+.tooth.active .fil0 {
+    fill: #014CA9;
+}
+
+.tooth.active .fil1 {
+    fill: white;
+}
+
+button.btn.btn-save {
+    background: #014CA9;
+    width: 50%;
+    color: white;
+    font-size: 18px;
+    padding: 11px;
+    border-radius: 9px;
+}
+
+.select-button button {
+    display: inline-block;
+    margin: 0 9px;
+    font-size: 15px !important;
+}
+
+div#modal-container {
+  text-align: left;
+}
+
+div#modal-container label {
+  color: #014CA9;
+  font-size: 17px;
+}
+
+.tooth-wrapper.not-allowed {
+  display: none;
+}
+
+.error.alert-danger.tooth-allowed {
+  padding: 3px;border-radius: 2px;
+}
+
+.error.alert-danger.tooth-allowed p {
+  margin: 0;
+}
+
+.error.alert-danger.tooth-allowed.none {
+  display: none;
+}
+
+button.btn.btn-save.active {
+    background: #000;
+}
+
+.not-allow-teeth .select-button {
+    display: none;
+}
+
+.select-button.not-allow-teeth {
+    display: none;
+}
+
+.tooth-wrapper.not-allow-teeth g.tooth {
+  pointer-events: none;
+}
