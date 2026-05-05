@@ -37,20 +37,26 @@ export default function AccountPage() {
   // reference on every token refresh, which would fire this effect repeatedly.
   useEffect(() => {
     if (!user?.id) return;
-    supabase
-      .from("orders")
-      .select("*")
-      .eq("doctor_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data, error }) => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("orders")
+          .select("*")
+          .eq("doctor_id", user.id)
+          .order("created_at", { ascending: false });
+        if (cancelled) return;
         if (error) console.error("Failed to load orders:", error);
         setOrders(data ? data.map(rowToOrder) : []);
-        setOrdersLoading(false);
-      })
-      .catch((err) => {
-        console.error("Unexpected error loading orders:", err);
-        setOrdersLoading(false);
-      });
+      } catch (err) {
+        if (!cancelled) console.error("Unexpected error loading orders:", err);
+      } finally {
+        if (!cancelled) setOrdersLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 

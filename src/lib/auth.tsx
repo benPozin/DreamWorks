@@ -153,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           phone,
           shippingAddress,
           createdAt: new Date().toISOString(),
+          isAdmin: false,
         },
         ready: true,
       });
