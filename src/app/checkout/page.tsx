@@ -2,8 +2,9 @@
 
 import { useState, useMemo, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ArrowUpRight, Lock, Calendar, Zap, Crown, Sparkles } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ArrowUpRight, Lock, Calendar, Zap, Crown, Sparkles, CheckCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 import { PageHeader } from "@/components/site/page-header";
 import { Section } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,19 @@ function CheckoutInner() {
   const [dueDate, setDueDate] = useState<string>("");
   const [isRush, setIsRush] = useState(false);
   const [shade, setShade] = useState<string>("");
+  const [patientInitials, setPatientInitials] = useState("");
+  const [notes, setNotes] = useState("");
+
+  // File state
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done" | "error">("idle");
+
+  // Submission state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   // When the service changes, snap tier to a valid one. Done in the handler
   // (not in an effect) so React 19's purity rules stay happy.
@@ -66,6 +80,83 @@ function CheckoutInner() {
     }
     const days = (new Date(v).getTime() - Date.now()) / 86_400_000;
     setIsRush(days >= 0 && days < 3);
+  };
+
+  const handleSubmit = async () => {
+    if (!user || !service || total === null) return;
+
+    // Validate required fields
+    if (!dueDate) {
+      setSubmitError("Please select a due date.");
+      return;
+    }
+    if (requiresToothSelection && multiplier === 0) {
+      setSubmitError(
+        isPerArch
+          ? "Please select at least one arch."
+          : "Please select at least one tooth.",
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const { data: insertedOrder, error } = await supabase.from("orders").insert({
+        doctor_id: user.id,
+        doctor_name: user.name,
+        doctor_email: user.email,
+        service_id: service.id,
+        service_name: service.name,
+        category: service.category,
+        tier,
+        teeth: teeth.length > 0 ? teeth : null,
+        shade: shade || null,
+        due_date: dueDate || null,
+        is_rush: isRush,
+        patient_initials: patientInitials || null,
+        notes: notes || null,
+        unit_price: unitPrice ?? 0,
+        quantity: multiplier,
+        total,
+      }).select().single();
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        setSubmitError(error.message);
+        return;
+      }
+
+      // If a file was attached, upload it now that we have the order ID
+      if (file && insertedOrder) {
+        setUploadState("uploading");
+        const safeName = file.name.replace(/\s+/g, "_");
+        const path = `${user.id}/${insertedOrder.id}/${safeName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("case-files")
+          .upload(path, file, { upsert: false });
+
+        if (uploadError) {
+          console.error("File upload error:", uploadError);
+          setUploadState("error");
+          // Order was saved — just note the file didn't upload
+          setSubmitError("Case submitted, but the file failed to upload. Please contact us.");
+        } else {
+          // Save the file path on the order
+          await supabase.from("orders").update({ file_path: path }).eq("id", insertedOrder.id);
+          setUploadState("done");
+        }
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Unexpected submit error:", err);
+      setSubmitError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const isPerArch = service?.mode.kind === "perArch";
@@ -129,6 +220,8 @@ function CheckoutInner() {
               <Label>Patient initials (optional)</Label>
               <input
                 placeholder="J.S."
+                value={patientInitials}
+                onChange={(e) => setPatientInitials(e.target.value)}
                 className="mt-1.5 w-full rounded-xl border border-border bg-white px-3.5 py-3 text-sm focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/15"
               />
             </div>
@@ -266,6 +359,8 @@ function CheckoutInner() {
                 <textarea
                   rows={3}
                   placeholder="Specific occlusion, contact, contour, or shade notes…"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                   className="mt-1.5 w-full rounded-xl border border-border bg-white px-3.5 py-3 text-sm placeholder:text-fg-subtle focus:outline-none focus:border-blue focus:ring-2 focus:ring-blue/15 resize-none"
                 />
               </div>
@@ -273,44 +368,96 @@ function CheckoutInner() {
                 <Label>3D case file</Label>
                 <p className="mt-1 text-xs text-fg-subtle">Up to 500MB.</p>
                 <div className="mt-2">
-                  <FileDropzone compact />
+                  <FileDropzone
+                  compact
+                  onFileChange={setFile}
+                  uploadState={uploadState}
+                />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="text-xs text-fg-subtle">Estimated total</div>
-              {user ? (
-                <div className="font-display text-2xl font-semibold tracking-tight">
-                  {total != null ? `$${total.toLocaleString()}` : "Select options"}
+          {submitted ? (
+            // ── Success state ──────────────────────────────────────────────
+            <div className="mt-6 flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2.5 text-green-700">
+                <CheckCircle className="size-5 shrink-0" />
+                <div>
+                  <div className="font-semibold">Case submitted!</div>
+                  <div className="text-sm text-green-600">We&apos;ll get started right away.</div>
                 </div>
-              ) : (
-                <Link
-                  href="/login?next=/checkout"
-                  className="mt-1 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-blue transition-colors"
-                >
-                  <Lock className="size-3.5" />
-                  Sign in to view pricing
-                </Link>
-              )}
-            </div>
-            <div className="flex w-full gap-2 sm:w-auto">
-              {!user && (
-                <Button asChild variant="ghost" size="sm" className="w-full sm:w-auto">
-                  <Link href="/login?next=/checkout">Sign in</Link>
+              </div>
+              <div className="flex gap-2 sm:ml-auto">
+                <Button asChild variant="primary" size="sm">
+                  <Link href="/account">View order history</Link>
                 </Button>
-              )}
-              <Button type="button" variant="primary" size="lg" className="w-full sm:w-auto">
-                Submit case
-                <ArrowUpRight className="size-4" />
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSubmitted(false);
+                    setTeeth([]);
+                    setShade("");
+                    setPatientInitials("");
+                    setNotes("");
+                    setDueDate("");
+                    setIsRush(false);
+                    setFile(null);
+                    setUploadState("idle");
+                  }}
+                >
+                  Submit another
+                </Button>
+              </div>
             </div>
-          </div>
-          <p className="mt-3 text-xs text-fg-subtle">
-            By submitting, you confirm you&apos;re a licensed dental professional.
-          </p>
+          ) : (
+            // ── Normal action bar ──────────────────────────────────────────
+            <>
+              <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-xs text-fg-subtle">Estimated total</div>
+                  {user ? (
+                    <div className="font-display text-2xl font-semibold tracking-tight">
+                      {total != null ? `$${total.toLocaleString()}` : "Select options"}
+                    </div>
+                  ) : (
+                    <Link
+                      href="/login?next=/checkout"
+                      className="mt-1 inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-blue transition-colors"
+                    >
+                      <Lock className="size-3.5" />
+                      Sign in to view pricing
+                    </Link>
+                  )}
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                  {!user && (
+                    <Button asChild variant="ghost" size="sm" className="w-full sm:w-auto">
+                      <Link href="/login?next=/checkout">Sign in</Link>
+                    </Button>
+                  )}
+                  {submitError && (
+                    <p className="text-sm text-red-600 self-center">{submitError}</p>
+                  )}
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    disabled={!user || total === null || submitting}
+                    onClick={handleSubmit}
+                  >
+                    {submitting ? "Submitting…" : "Submit case"}
+                    {!submitting && <ArrowUpRight className="size-4" />}
+                  </Button>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-fg-subtle">
+                By submitting, you confirm you&apos;re a licensed dental professional.
+              </p>
+            </>
+          )}
         </div>
       </Section>
     </>

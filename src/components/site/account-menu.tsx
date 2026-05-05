@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, LogOut, User as UserIcon, FileText } from "lucide-react";
+import { ChevronDown, LogOut, User as UserIcon, FileText, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 function initials(name: string) {
@@ -77,6 +77,14 @@ export function AccountMenu() {
               <MenuLink href="/checkout" icon={FileText} onClick={() => setOpen(false)}>
                 Submit a case
               </MenuLink>
+              {user.isAdmin && (
+                <>
+                  <div className="mx-4 my-1 border-t border-border" />
+                  <MenuLink href="/admin" icon={ShieldCheck} onClick={() => setOpen(false)}>
+                    Lab admin
+                  </MenuLink>
+                </>
+              )}
               <button
                 onClick={() => {
                   logout();

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, memo } from "react";
 
-export function ToothSelector({
+function ToothSelectorBase({
   onChange,
   showSelectAll = false,
   compact = false,
@@ -228,3 +228,7 @@ export function ToothSelector({
     </div>
   );
 }
+
+// memo prevents re-renders when unrelated parent state (e.g. shade) changes,
+// which would otherwise reset the injected HTML and wipe selected teeth.
+export const ToothSelector = memo(ToothSelectorBase);
