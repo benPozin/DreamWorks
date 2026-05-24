@@ -1,67 +1,79 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Section, SectionHeading } from "@/components/site/section";
-import { FilePlus2, ScanLine, Hammer, Truck } from "lucide-react";
 
 const steps = [
   {
-    icon: FilePlus2,
-    title: "Submit the case",
-    body: "Upload your 3D scan, mark the teeth, pick a shade, set a due date. Less than two minutes.",
+    title: "Submit",
+    body: "Upload your scan, mark teeth, pick a shade. Under two minutes.",
   },
   {
-    icon: ScanLine,
-    title: "We design it",
-    body: "Our designer reviews, and reaches out directly if anything is unclear before milling begins.",
+    title: "Design",
+    body: "Our designer reviews, and reaches out if anything is unclear.",
   },
   {
-    icon: Hammer,
-    title: "We craft it",
-    body: "Milled, finished, and quality-checked by hand against your prescription before it leaves the lab.",
+    title: "Craft",
+    body: "Milled, finished, and quality-checked by hand against your prescription.",
   },
   {
-    icon: Truck,
-    title: "Shipped to your chair",
-    body: "Tracked delivery with rush options for cases that can't wait.",
+    title: "Ship",
+    body: "Tracked delivery. Rush options for cases that can't wait.",
   },
 ];
 
 export function Process() {
   return (
-    <Section id="process" className="py-8! sm:py-10!">
-      <SectionHeading
-        eyebrow="How it works"
-        title="A frictionless lab, end to end."
-        description="From scan upload to seated restoration. The same four steps for every case, VIP or routine."
-      />
+    /* Full-bleed navy section */
+    <section
+      id="process"
+      className="relative w-full bg-primary py-24 sm:py-32 overflow-hidden"
+    >
+      {/* Subtle top/bottom edge fade lines */}
+      <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-white/10" />
 
-      <div className="mt-10 relative">
-        {/* connector line */}
-        <div className="hidden lg:block absolute left-0 right-0 top-7 h-px bg-linear-to-r from-transparent via-border to-transparent" />
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="pb-10 border-b border-white/15">
+          <div className="text-[11px] uppercase tracking-[0.24em] text-white/50 font-semibold">
+            02 — How it works
+          </div>
+          <motion.h2
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-4 font-display text-[40px] sm:text-[56px] tracking-[-0.03em] leading-[1.0] text-white max-w-3xl"
+          >
+            Four steps,{" "}
+            <span className="font-serif italic font-light text-white/50">
+              end to end.
+            </span>
+          </motion.h2>
+        </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10 pt-14">
           {steps.map((s, i) => (
             <motion.div
               key={s.title}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: i * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: i * 0.08, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
               className="relative"
             >
-              <div className="relative z-10 flex size-14 items-center justify-center rounded-2xl bg-white border border-border shadow-[0_8px_20px_-12px_rgba(15,39,70,0.18)]">
-                <s.icon className="size-6 text-blue" strokeWidth={1.5} />
-                <span className="absolute -top-2 -right-2 size-6 rounded-full bg-blue text-white text-[10px] font-bold flex items-center justify-center">
-                  {i + 1}
-                </span>
+              <div className="font-display text-[64px] font-light text-blue/50 tracking-tight tabular-nums leading-none">
+                {String(i + 1).padStart(2, "0")}
               </div>
-              <h3 className="mt-5 font-display text-lg font-semibold tracking-tight">{s.title}</h3>
-              <p className="mt-1.5 text-sm text-fg-muted leading-relaxed">{s.body}</p>
+              <h3 className="mt-5 font-display text-xl font-semibold tracking-tight text-white">
+                {s.title}
+              </h3>
+              <p className="mt-2 text-sm text-white/55 leading-relaxed max-w-[300px]">
+                {s.body}
+              </p>
             </motion.div>
           ))}
         </div>
       </div>
-    </Section>
+    </section>
   );
 }

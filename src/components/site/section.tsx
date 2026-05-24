@@ -14,7 +14,7 @@ export function Section({
   id?: string;
 }) {
   return (
-    <section id={id} className={cn("relative mx-auto max-w-6xl px-6 py-16 sm:py-20", className)}>
+    <section id={id} className={cn("relative mx-auto max-w-7xl px-6 py-16 sm:py-20", className)}>
       {children}
     </section>
   );
@@ -69,8 +69,8 @@ export function SectionHeading({
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-3 font-display text-4xl sm:text-5xl tracking-tight text-fg leading-[1.05]"
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-3 font-display text-[36px] sm:text-[52px] tracking-[-0.025em] text-fg leading-[1.02]"
       >
         {title}
       </motion.h2>

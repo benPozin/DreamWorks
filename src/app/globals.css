@@ -1,25 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #FFFFFF;
-  --bg-elevated: #FFFFFF;
-  --bg-muted: #F4F7FB;
-  --fg: #0A1A2F;
-  --fg-muted: #4A5C75;
-  --fg-subtle: #6B7E96;
-  --primary: #0F2746;          /* deep navy text/UI */
+  /* ─── Surfaces (luxury near-white) ─── */
+  --bg: #FBFCFE;              /* page bg — barely off-white, holds depth */
+  --bg-elevated: #FFFFFF;     /* cards, modals */
+  --bg-muted: #F2F5FA;        /* subtle fills */
+  --bg-deep: #E8EEF6;         /* dividers, hover wash */
+
+  /* ─── Text ─── */
+  --fg: #0A1A2F;              /* near-black navy */
+  --fg-muted: #475569;        /* slate-600 — better contrast */
+  --fg-subtle: #64748B;       /* slate-500 */
+
+  /* ─── Brand navy ─── */
+  --primary: #0F2746;
   --secondary: #1C3A66;
   --border: #E2EAF3;
-  --border-strong: #CBD7E6;
+  --border-strong: #C8D5E6;
 
-  /* DreamWorks blue (brand accent, used like gold/CTA on the main site) */
+  /* ─── DreamWorks blue (CTA / accent) ─── */
   --blue: #1B5BAE;
   --blue-soft: #2D6FC9;
   --blue-deep: #143D75;
   --blue-tint: #DDE9F8;
   --blue-haze: #EEF4FC;
+  --blue-ink: #0A2547;        /* near-black blue, for text on tint */
 
-  /* VIP palette (dark + gold, used ONLY on /vip) */
+  /* ─── VIP palette (dark + gold, used ONLY on /vip and VIP teaser) ─── */
   --vip-bg: #0C0A09;
   --vip-bg-elevated: #1C1917;
   --vip-fg: #FAFAF9;
@@ -28,12 +35,25 @@
   --vip-gold-soft: #EAB308;
   --vip-champagne: #E7D7A1;
   --vip-border: rgba(212, 160, 23, 0.2);
+
+  /* ─── Shadows (premium, layered) ─── */
+  --shadow-xs: 0 1px 2px rgba(15, 39, 70, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(15, 39, 70, 0.06), 0 1px 2px rgba(15, 39, 70, 0.04);
+  --shadow-md: 0 8px 24px -8px rgba(15, 39, 70, 0.10), 0 4px 8px -4px rgba(15, 39, 70, 0.06);
+  --shadow-lg: 0 24px 48px -16px rgba(15, 39, 70, 0.14), 0 8px 16px -8px rgba(15, 39, 70, 0.08);
+  --shadow-xl: 0 40px 80px -24px rgba(15, 39, 70, 0.20), 0 16px 32px -8px rgba(15, 39, 70, 0.10);
+  --shadow-blue: 0 16px 40px -12px rgba(27, 91, 174, 0.35), 0 4px 12px -2px rgba(27, 91, 174, 0.18);
+
+  /* ─── Easing ─── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-elevated: var(--bg-elevated);
   --color-bg-muted: var(--bg-muted);
+  --color-bg-deep: var(--bg-deep);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
@@ -44,6 +64,7 @@
   --color-blue-deep: var(--blue-deep);
   --color-blue-tint: var(--blue-tint);
   --color-blue-haze: var(--blue-haze);
+  --color-blue-ink: var(--blue-ink);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-vip-bg: var(--vip-bg);
@@ -65,12 +86,17 @@
   border-color: var(--border);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
 }
 
 ::selection {
@@ -78,16 +104,35 @@ html, body {
   color: #fff;
 }
 
-/* ─── Liquid glass surfaces (light) ─── */
+/* ─── Layered page background — near white, single faint top accent ─── */
+body {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -5%, rgba(27, 91, 174, 0.04) 0%, transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* ─── Liquid glass surfaces (light) — refined for premium feel ─── */
 .glass {
-  background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(238,244,252,0.65) 100%);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border: 1px solid rgba(255,255,255,0.85);
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(246,248,252,0.78) 100%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.95) inset,
+    0 1px 0 rgba(255,255,255,1) inset,
     0 0 0 1px rgba(15,39,70,0.04),
-    0 24px 48px -24px rgba(15,39,70,0.14);
+    var(--shadow-md);
+}
+
+.glass-strong {
+  background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(238,244,252,0.92) 100%);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,1) inset,
+    0 0 0 1px rgba(15,39,70,0.05),
+    var(--shadow-lg);
 }
 
 .glass-blue {
@@ -108,6 +153,7 @@ html, body {
     0 24px 48px -24px rgba(0,0,0,0.6);
 }
 
+/* ─── Gradient text ─── */
 .blue-text {
   background: linear-gradient(135deg, #1B5BAE 0%, #2D6FC9 50%, #143D75 100%);
   -webkit-background-clip: text;
@@ -129,6 +175,14 @@ html, body {
   color: transparent;
 }
 
+.ink-text {
+  background: linear-gradient(180deg, #0A1A2F 0%, #1C3A66 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Subtle film grain on dark surfaces ─── */
 .noise {
   position: relative;
 }
@@ -137,18 +191,24 @@ html, body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.03;
+  opacity: 0.035;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Subtle grid background — useful behind hero */
+/* ─── Subtle grid background — useful behind hero ─── */
 .grid-bg {
   background-image:
-    linear-gradient(rgba(15,39,70,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15,39,70,0.04) 1px, transparent 1px);
-  background-size: 56px 56px;
+    linear-gradient(rgba(15,39,70,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,39,70,0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%);
+}
+
+.dot-bg {
+  background-image: radial-gradient(rgba(15, 39, 70, 0.10) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 30%, #000 20%, transparent 75%);
 }
 
 /* ─── Animated mesh background ─── */
@@ -171,6 +231,7 @@ html, body {
   animation: mesh-drift 22s ease-in-out infinite;
 }
 
+/* ─── Shimmer (used on subtle highlights / loading) ─── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -179,6 +240,31 @@ html, body {
   background: linear-gradient(110deg, transparent 30%, rgba(27,91,174,0.35) 50%, transparent 70%);
   background-size: 200% 100%;
   animation: shimmer 3.5s linear infinite;
+}
+
+/* ─── Slow drift for hero accents ─── */
+@keyframes drift-slow {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-12px, 8px); }
+}
+.drift-slow {
+  animation: drift-slow 14s ease-in-out infinite;
+}
+
+/* ─── Marquee (logo strip / press) ─── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+
+/* ─── Hairline divider (gradient horizontal rule) ─── */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(15,39,70,0.14), transparent);
+  border: 0;
 }
 
 /* ─── Reduced motion ─── */
